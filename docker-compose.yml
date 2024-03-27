@@ -1,0 +1,38 @@
+version: "3.9"
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME}
+
+services:
+  wordpress:
+    image: wordpress:6.4.3-php8.1-apache
+    depends_on: [ mysql ]
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: super
+      WORDPRESS_DB_NAME: wordpress
+    expose:
+      - 80
+    ports:
+      - 80:80
+    volumes:
+      - ./wordpress:/var/www/html/
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: super
+    volumes:
+      # - ./db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - mysql:/var/lib/mysql
+
+volumes:
+  mysql:
